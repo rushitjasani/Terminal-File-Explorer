@@ -10,5 +10,7 @@ char root[4096];
 char cur_dir[4096];
 std::vector <string> dlist;
 std::stack <string> b_space_track;
+std::stack <string> back_stack;
+std::stack <string> forw_stack;
 unsigned int cx=0;
 unsigned int cy=0;
