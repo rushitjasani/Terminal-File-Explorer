@@ -6,4 +6,4 @@
 
 int g_argc = 0;
 char ** g_argv;
-char root[4096] = "";
+char root[4096];

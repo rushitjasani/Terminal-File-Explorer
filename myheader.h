@@ -12,8 +12,7 @@ using namespace std;
 #define MYHEADER_H
 #endif
 
-extern int g_argc;            //global argc
-extern char ** g_argv;        //global argv
-extern char root[PATH_MAX];   //global root variable
-int listdir(const char *);    //ls function
-void display(const char *);   //to display like ls -a
+
+int listdir(const char *);    //ls function.
+void display(const char *);   //to display like ls -a.
+void enableNCanon();          //to enter into Normal mode.
