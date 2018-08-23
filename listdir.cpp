@@ -2,11 +2,16 @@
 #define MYHEADER_H
 #include "myheader.h"
 #endif
+#ifndef GLOBAL_H
+#define GLOBAL_H
+#include "global.h"
+#endif
 
 //list directory in currnet dir.
 int listdir(const char *path)
 {
-  printf("\033[2J");
+  write(STDOUT_FILENO, "\x1b[2J", 4);
+  write(STDOUT_FILENO, "\x1b[H", 3);
   struct dirent *d;
   DIR *dp;
   dp = opendir(path);
@@ -14,7 +19,18 @@ int listdir(const char *path)
     perror("opendir");
     return -1;
   }
-  while((d = readdir(dp))) display(d->d_name);
+  dlist.clear();
+  cx = 0;
+  cy = 0;
+  while((d = readdir(dp))){
+    if(b_space_track.size() == 1){
+      strcpy(cur_dir,root);
+      if(strcmp(d->d_name,"..") == 0) continue;
+    }
+    dlist.push_back(d->d_name);
+    display(d->d_name);
+  }
+  write(STDOUT_FILENO, "\x1b[H", 3);
   closedir(dp);
   return 0;
 }
