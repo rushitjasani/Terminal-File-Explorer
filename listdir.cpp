@@ -6,6 +6,7 @@
 //list directory in currnet dir.
 int listdir(const char *path)
 {
+  printf("\033[2J");
   struct dirent *d;
   DIR *dp;
   dp = opendir(path);
