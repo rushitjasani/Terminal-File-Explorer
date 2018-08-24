@@ -16,3 +16,4 @@ using namespace std;
 int listdir(const char *);    //ls function.
 void display(const char *);   //to display like ls -a.
 void enableNCanon();          //to enter into Normal mode.
+string SplitFilename(string );  //returns path to given file or folder.
