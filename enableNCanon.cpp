@@ -10,11 +10,6 @@
 
 struct termios raw, newraw;
 
-void disableNCanon(){
-  tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
-}
-
-
 void enableNCanon(){
   //getting the initial terminal settings
   tcgetattr(STDIN_FILENO, &raw);
@@ -150,11 +145,6 @@ void enableNCanon(){
             if(system(op.c_str()) == -1) continue;
           }
         }
-
-      }
-      else
-      {
-
       }
     }
   }
