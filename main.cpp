@@ -22,7 +22,8 @@ int main(int argc, char **argv){
   /*cout << root << endl;
   sleep(5);*/
   strcat(cur_dir,root);
-  b_space_track.push(root);
+  //b_space_track.push(root);
+  //back_stack.push(root);
   listdir(root);                                                   //list directories inside root.
   enableNCanon();                                                  //enable non-canon mode.
   return 0;

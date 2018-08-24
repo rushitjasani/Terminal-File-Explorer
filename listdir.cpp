@@ -23,7 +23,11 @@ int listdir(const char *path)
   cx = 0;
   cy = 0;
   while((d = readdir(dp))){
-    if(b_space_track.size() == 1){
+    /*if(b_space_track.size() == 1){
+      strcpy(cur_dir,root);
+      if(strcmp(d->d_name,"..") == 0) continue;
+    }*/
+    if(strcmp(path, root) == 0){
       strcpy(cur_dir,root);
       if(strcmp(d->d_name,"..") == 0) continue;
     }

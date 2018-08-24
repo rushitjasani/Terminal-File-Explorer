@@ -63,7 +63,12 @@ void enableNCanon(){
             }
         }
         else if(ch=='C'){
-
+          /*if(!forw_stack.empty()){
+              string p = forw_stack.top();
+                back_stack.push(p);
+              back
+          }
+          else continue;*/
         }
         else if(ch=='D'){
 
@@ -73,14 +78,17 @@ void enableNCanon(){
         }
       }
       else if(ch=='H' || ch=='h'){
-              while(b_space_track.size() != 1)b_space_track.pop();
+              //while(b_space_track.size() != 1)b_space_track.pop();
               strcpy(cur_dir,root);
               listdir(cur_dir);
       }
       else if(ch==127){
-        if(b_space_track.size() > 1) b_space_track.pop();
+        /*if(b_space_track.size() > 1) b_space_track.pop();
         string cur_dir = b_space_track.top();
-        listdir(cur_dir.c_str());
+        listdir(cur_dir.c_str());*/
+        string s_name = SplitFilename(string(cur_dir));
+        strcpy(cur_dir,s_name.c_str());
+        listdir(cur_dir);
       }
       else if(ch == 10){
         //cout << dlist[cx] << endl;
@@ -88,7 +96,7 @@ void enableNCanon(){
               listdir(cur_dir);
         }
         else if(dlist[cx] == parent ){
-          b_space_track.pop();
+          //b_space_track.pop();
           string s_name = cur_dir;
           s_name = SplitFilename(s_name);
           strcpy(cur_dir,s_name.c_str());
@@ -101,7 +109,9 @@ void enableNCanon(){
           char *f_path = new char[cur_d.length() + strlen(p_path) + 1];
           strcpy(f_path,p_path);
           strcat(f_path, cur_d.c_str());
-          b_space_track.push(f_path);
+          //b_space_track.push(f_path);
+          //back_stack.push_back(fpath);
+          //while(! forw_stack.empty()) forw_stack.pop();
           strcpy(cur_dir,f_path);
           struct stat sb;
           stat(f_path, &sb);
