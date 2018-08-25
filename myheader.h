@@ -6,6 +6,8 @@
 #include<sys/stat.h>
 #include<termios.h>
 #include <unistd.h>
+#include<sys/ioctl.h>
+#include <fcntl.h>
 using namespace std;
 
 #ifndef MYHEADER_H
