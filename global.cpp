@@ -11,5 +11,7 @@ char cur_dir[4096];
 std::vector <string> dlist;
 std::stack <string> back_stack;
 std::stack <string> forw_stack;
-unsigned int cx=0;
+unsigned int cx=1;
 unsigned int cy=0;
+unsigned int term_row;
+int cur_window = 0;

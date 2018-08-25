@@ -7,11 +7,14 @@
 #include "global.h"
 #endif
 
+struct winsize terminal;
 //list directory in currnet dir.
 int listdir(const char *path)
 {
-  write(STDOUT_FILENO, "\x1b[2J", 4);
-  write(STDOUT_FILENO, "\x1b[H", 3);
+  ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
+  term_row = terminal.ws_row - 2 ;
+  write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
+  CURSER;
   struct dirent *d;
   DIR *dp;
   dp = opendir(path);
@@ -19,22 +22,29 @@ int listdir(const char *path)
     perror("opendir");
     return -1;
   }
+
   dlist.clear();
-  cx = 0;
-  cy = 0;
+
   while((d = readdir(dp))){
-    /*if(b_space_track.size() == 1){
-      strcpy(cur_dir,root);
-      if(strcmp(d->d_name,"..") == 0) continue;
-    }*/
     if(strcmp(path, root) == 0){
       strcpy(cur_dir,root);
       if(strcmp(d->d_name,"..") == 0) continue;
-    }
-    dlist.push_back(d->d_name);
-    display(d->d_name);
+      }
+      dlist.push_back(d->d_name);
   }
-  write(STDOUT_FILENO, "\x1b[H", 3);
+
+  int vecsize = dlist.size();
+
+  int from = cur_window;
+  int to;
+  if((unsigned)vecsize <= term_row) to = vecsize-1;
+  else to = term_row+cur_window;
+
+  for(int i=from; i <= to; i++){
+      string t = dlist[i];
+      display(t.c_str());
+    }
+  CURSER;
   closedir(dp);
   return 0;
 }
