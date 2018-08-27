@@ -67,6 +67,7 @@ void UpArrow(){
 }
 
 void DownArrow(){
+  //cout << cx << "##" << cur_window << "##" << dlist.size();
   if(cx <= term_row && cx < dlist.size())
   {
     cx++;
