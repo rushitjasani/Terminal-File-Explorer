@@ -7,6 +7,7 @@
 #include "global.h"
 #endif
 
+struct winsize terminal;
 //list directory in currnet dir.
 int listdir(const char *path)
 {
@@ -31,7 +32,7 @@ int listdir(const char *path)
       }
       dlist.push_back(d->d_name);
   }
-  sort(dlist.begin(),dlist.end());
+
   int vecsize = dlist.size();
 
   int from = cur_window;
