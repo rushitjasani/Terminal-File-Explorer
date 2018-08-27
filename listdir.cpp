@@ -7,7 +7,6 @@
 #include "global.h"
 #endif
 
-struct winsize terminal;
 //list directory in currnet dir.
 int listdir(const char *path)
 {

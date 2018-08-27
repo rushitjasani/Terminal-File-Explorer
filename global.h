@@ -12,7 +12,10 @@ extern char cur_dir[4096];          //to maintain current dir
 extern vector< string > dlist;      //global vector for dirctory names
 extern stack <string> back_stack;
 extern stack <string> forw_stack;
+extern vector <char> command_string;
 extern unsigned int cx;
 extern unsigned int cy;
 extern unsigned int term_row;
 extern int cur_window;
+extern struct winsize terminal;
+extern struct termios raw, newraw;

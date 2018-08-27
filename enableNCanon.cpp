@@ -11,12 +11,9 @@
 string parent = "..";
 string current = ".";
 
-struct termios raw, newraw;
-
 void enableNCanon(){
   //getting the initial terminal settings
   tcgetattr(STDIN_FILENO, &raw);
-  //atexit(disableNCanon);
   newraw = raw;
 
   //changing ICANON for entering Non Canonical mode.
@@ -29,6 +26,10 @@ void enableNCanon(){
   else{
     char ch;
     while(1){
+      unsigned int tmp = terminal.ws_row;
+      printf("%c[%d;%dH",27,tmp,cy);
+      printf(":::::Normal Mode:::::");
+      CURSER;
       ch=cin.get();
       //check for first char and if ESC then go inside loop.
       if(ch==27){
@@ -43,12 +44,14 @@ void enableNCanon(){
       else if(ch=='H' || ch=='h') HomeKey();
       else if(ch==127)            BackspaceKey();
       else if(ch == 10)           EnterKey();
+      else if(ch == ':')          command_mode();
+      else if(ch == 'q'){
+        write(STDOUT_FILENO, "\x1b[2J", 4);
+        exit(0);
+      }
     }
   }
-  tcsetattr(STDIN_FILENO,TCSAFLUSH,&raw);
-  exit(0);
 }
-
 
 void UpArrow(){
   if(cx > 1)
@@ -77,6 +80,8 @@ void DownArrow(){
 }
 
 void RightArrow(){
+  cx = 1;
+  CURSER;
   if(!forw_stack.empty()){
       string p = forw_stack.top();
       forw_stack.pop();
@@ -87,6 +92,8 @@ void RightArrow(){
 }
 
 void LeftArrow(){
+  cx = 1;
+  CURSER;
   if(back_stack.size() > 1){
       string p = back_stack.top();
       forw_stack.push(p);
@@ -103,6 +110,8 @@ void LeftArrow(){
 }
 
 void HomeKey(){
+  cx = 1;
+  CURSER;
   strcpy(cur_dir,root);
   back_stack.push(cur_dir);
   while(!forw_stack.empty()) forw_stack.pop();
@@ -110,6 +119,8 @@ void HomeKey(){
 }
 
 void BackspaceKey(){
+  cx = 1;
+  CURSER;
   if((strcmp(cur_dir,root)) != 0 ){
     string s_name = SplitFilename(string(cur_dir));
     strcpy(cur_dir,s_name.c_str());
@@ -147,12 +158,10 @@ void EnterKey(){
     strcpy(f_path,p_path);
     strcat(f_path, cur_d.c_str());
     strcpy(cur_dir,f_path);
-
     //Maintaing forward and backward stacks.
     back_stack.push(f_path);
     //clear forward stack if entering in any directory manually.
     while(!forw_stack.empty()) forw_stack.pop();
-
     //check if selected file is FILE or DIRECTORY.
     struct stat sb;
     stat(f_path, &sb);
@@ -163,8 +172,12 @@ void EnterKey(){
     }
     else if( S_ISREG(sb.st_mode) ){
       //if FILE then open by xdg-open.
-      string op = "xdg-open " + string(f_path);
+      back_stack.pop();
+      string top = back_stack.top();
+      strcpy(cur_dir,top.c_str());
+      string op = "bash -c 'xdg-open " + string(f_path) + "' 2> /dev/null ";
       system(op.c_str());
+      CURSER;
     }
   }
 }

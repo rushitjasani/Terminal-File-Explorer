@@ -8,6 +8,7 @@
 #include <unistd.h>
 #include<sys/ioctl.h>
 #include <fcntl.h>
+#include <pwd.h>  //for username and groupname from userid and grpid.
 using namespace std;
 
 #ifndef MYHEADER_H
@@ -26,3 +27,4 @@ void RightArrow();
 void HomeKey();
 void EnterKey();
 void BackspaceKey();
+void command_mode();
