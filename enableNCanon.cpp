@@ -84,8 +84,6 @@ void DownArrow(){
 }
 
 void RightArrow(){
-  cx = 1;
-  CURSER;
   if(!forw_stack.empty()){
       string p = forw_stack.top();
       forw_stack.pop();
@@ -96,8 +94,6 @@ void RightArrow(){
 }
 
 void LeftArrow(){
-  cx = 1;
-  CURSER;
   if(back_stack.size() > 1){
       string p = back_stack.top();
       forw_stack.push(p);
@@ -114,8 +110,6 @@ void LeftArrow(){
 }
 
 void HomeKey(){
-  cx = 1;
-  CURSER;
   strcpy(cur_dir,root);
   back_stack.push(cur_dir);
   while(!forw_stack.empty()) forw_stack.pop();
@@ -123,8 +117,6 @@ void HomeKey(){
 }
 
 void BackspaceKey(){
-  cx = 1;
-  CURSER;
   if((strcmp(cur_dir,root)) != 0 ){
     string s_name = SplitFilename(string(cur_dir));
     strcpy(cur_dir,s_name.c_str());

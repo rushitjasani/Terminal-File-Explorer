@@ -8,20 +8,24 @@
 #include "global.h"
 #endif
 
+bool goto_flag;
 void command_mode(){
   while(1){
+    goto_flag = false;
     cx = terminal.ws_row;
-    cy = 0;
+    cy = 1;
     CURSER;
     printf("\x1b[0K");
     printf(":");
+    cy++;
     char ch;
     command_string.clear();
+    my_command.clear();
     while(1){
       ch = cin.get();
       if(ch == 27){
         cx = 1;
-        cy = 0;
+        cy = 1;
         CURSER;
         return;
       }
@@ -29,9 +33,14 @@ void command_mode(){
         command_string.push_back(' ');
         split_command();
         function_call();
-        cy = 0;
-        cx = 1;
+        if(goto_flag) return;
         break;
+      }
+      else if(ch == 127){
+        cy--;
+        CURSER;
+        printf("\x1b[0K");
+        command_string.pop_back();
       }
       else{
         cout << ch;
@@ -43,64 +52,117 @@ void command_mode(){
   return;
 }
 
+void show_error(){
+  cx = terminal.ws_row;
+  cy = 1;
+  CURSER;
+  printf("\x1b[0K");
+  printf("Something went wrong. Try again.");
+  return;
+}
+void show_success(){
+  cx = terminal.ws_row;
+  cy = 1;
+  CURSER;
+  printf("\x1b[0K");
+  printf("Done :)");
+  return;
+}
 
 void my_copy(){}
 void my_move(){}
-void my_rename(){}
-void create_file(){}
-
-void create_dir(){
-  for(unsigned int i=1;i<my_command.size();i++){
-    string path = my_command[i];
-    mkdir(path.c_str(),);
+void my_rename(){
+  if(my_command.size()!=3)printf("Improper Arguments.");
+  else{
+      string old = create_absolute_path(my_command[1]);
+      string new_ = create_absolute_path(my_command[2]);
+      if(rename(old.c_str(),new_.c_str()) != 0) show_error();
+      else show_success();
   }
+  return;
 }
-
-void delete_file(){}
+void create_file(){
+  if(my_command.size()!=3)printf("Improper Arguments.");
+  else{
+      string dest_path = create_absolute_path(my_command[2]);
+      dest_path = dest_path + "/" + my_command[1];
+      FILE *file_create;
+      file_create = fopen(dest_path.c_str(),"w");
+      if(file_create == NULL) show_error();
+      else show_success();
+      fclose(file_create);
+  }
+  return;
+}
+void create_dir(){
+  if(my_command.size() != 3) printf("Improper Arguments.");
+  else{
+    string dest_path = create_absolute_path(my_command[2]) + "/" + my_command[1];
+    if(mkdir(dest_path.c_str(),0755) != 0)show_error();
+    else show_success();
+  }
+  return;
+}
+void delete_file(){
+  if(my_command.size() != 2) printf("Improper Arguments.");
+  else{
+      string remove_path = create_absolute_path(my_command[1]);
+      if(remove(remove_path.c_str()) != 0)show_error();
+      else show_success();
+  }
+  return;
+}
 void delete_dir(){}
-void my_goto(){}
+void my_goto(){
+  if(my_command.size() != 2) printf("Improper Arguments.");
+  else{
+    string goto_path = create_absolute_path(my_command[1]);
+    strcpy(cur_dir,goto_path.c_str());
+    goto_flag = true;
+  }
+  return;
+}
 void my_search(){}
 void snapshot(){}
 
-
 /*============================================================
-take command string, split it and put it in string vector and
-convert in absolute path.
+take relative path and convert to absolute path.
+=============================================================*/
+string create_absolute_path(string r_path){
+  string abs_path="";
+  if(r_path[0] == '~'){
+    r_path = r_path.substr(1,r_path.length());
+    abs_path = string(root) + r_path;
+  }
+  else if(r_path[0] == '/'){
+    abs_path = string(root) + r_path;
+  }
+  else if(r_path[0] == '.'){
+    abs_path = string(cur_dir) + r_path.substr(1,r_path.length());
+  }
+  else{
+    abs_path = string(cur_dir)+"/"+r_path;
+  }
+  return abs_path;
+}
+/*============================================================
+take command string, split it and put it in string vector.
 =============================================================*/
 void split_command(){
   string tmp="";
-  string abs_path="";
   unsigned int i=0;
-  while(command_string[i] != ' '){
-    tmp+=command_string[i];
-    i++;
-  }
-  my_command.push_back(tmp);
-  i++;
-  tmp = "";
   for(;i<=command_string.size();i++){
     if(command_string[i] == ' ' ){
-      if(tmp[0] == '~'){
-        tmp = tmp.substr(1,tmp.length());
-        abs_path = string(root) + tmp;
-      }
-      else if(tmp[0] == '/'){
-        abs_path = string(root) + tmp;
-      }
-      else if(tmp[0] == '.'){
-        abs_path = string(cur_dir) + tmp.substr(1,tmp.length());
-      }
-      else{
-        abs_path = string(cur_dir)+"/"+tmp;
-      }
-      my_command.push_back(abs_path);
-      tmp="";
+      my_command.push_back(tmp);
+      tmp = "";
     }
     else tmp+=command_string[i];
   }
   return;
 }
-
+/*============================================================
+calls various functions based on first argument of command.
+=============================================================*/
 void function_call(){
   string s=my_command[0];
   if(s == "copy")             my_copy();
@@ -117,4 +179,5 @@ void function_call(){
     cout << "INVALID COMMAND :: try again";
     sleep(3);
   }
+  return;
 }

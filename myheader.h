@@ -40,3 +40,4 @@ void delete_dir();
 void my_goto();
 void my_search();
 void snapshot();
+string create_absolute_path(string);

@@ -13,6 +13,8 @@ int listdir(const char *path)
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
   term_row = terminal.ws_row - 2 ;
   write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
+  cx = 1;
+  cy = 0;
   CURSER;
   struct dirent *d;
   DIR *dp;
