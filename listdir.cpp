@@ -7,7 +7,6 @@
 #include "global.h"
 #endif
 
-
 //list directory in currnet dir.
 int listdir(const char *path)
 {

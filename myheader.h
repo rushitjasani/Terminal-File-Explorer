@@ -28,3 +28,5 @@ void HomeKey();
 void EnterKey();
 void BackspaceKey();
 void command_mode();
+void split_command();
+void function_call();

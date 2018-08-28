@@ -44,7 +44,10 @@ void enableNCanon(){
       else if(ch=='H' || ch=='h') HomeKey();
       else if(ch==127)            BackspaceKey();
       else if(ch == 10)           EnterKey();
-      else if(ch == ':')          command_mode();
+      else if(ch == ':'){
+          command_mode();
+          listdir(cur_dir);
+      }
       else if(ch == 'q'){
         write(STDOUT_FILENO, "\x1b[2J", 4);
         exit(0);

@@ -8,12 +8,6 @@
 #include "global.h"
 #endif
 
-void call_function(){
-  string s = "touch rushit.txt";
-  system(s.c_str());
-  return;
-}
-
 void command_mode(){
   while(1){
     cx = terminal.ws_row;
@@ -32,7 +26,8 @@ void command_mode(){
         return;
       }
       else if(ch == 10){
-        call_function();
+        split_command();
+        function_call();
         break;
       }
       else{
@@ -43,4 +38,55 @@ void command_mode(){
     }
   }
   return;
+}
+
+void split_command(){
+  string tmp="";
+  for(unsigned int i=0;i<=command_string.size();i++){
+    if(command_string[i] == ' ' ){
+        my_command.push_back(tmp);
+        tmp="";
+    }
+    else tmp+=command_string[i];
+  }
+  my_command.push_back(tmp);
+  return;
+}
+
+void function_call(){
+  string s=my_command[0];
+  if(s == "copy"){
+    cout << s ;
+  }
+  else if(s == "move"){
+    cout << s ;
+  }
+  else if(s == "rename"){
+    cout << s ;
+  }
+  else if(s == "create_file"){
+    cout << s ;
+  }
+  else if(s == "create_dir"){
+    cout << s ;
+  }
+  else if(s == "delete_file"){
+    cout << s ;
+  }
+  else if(s == "delete_dir"){
+    cout << s ;
+  }
+  else if(s == "goto"){
+    cout << s ;
+  }
+  else if(s == "search"){
+    cout << s ;
+  }
+  else if(s == "snapshot"){
+    cout << s ;
+  }
+  else{
+    cout << "THULLU" ;
+  }
+
 }
