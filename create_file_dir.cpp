@@ -9,7 +9,7 @@
 #endif
 
 void create_file(){
-  if(my_command.size() < 3)perror("too few arguments.");
+  if(my_command.size() < 3)printf("too few arguments:\n");
   else{
     string dest_folder =create_absolute_path(my_command[my_command.size()-1]);
     FILE *file_create;
@@ -17,7 +17,7 @@ void create_file(){
       string dest_path = dest_folder + "/" + my_command[i];
       file_create = fopen(dest_path.c_str(),"w");
       if(file_create == NULL) perror("");
-      else printf("Done!");
+      else cout << "file created" << endl;
       fclose(file_create);
     }
   }
@@ -31,7 +31,8 @@ void create_dir(){
     for(unsigned int i=1;i<my_command.size()-1;i++){
       string dest_path = dest_folder + "/" + my_command[i];
 
-      if(mkdir(dest_path.c_str(),0755) != 0)printf("Error");
+      if(mkdir(dest_path.c_str(),0755) != 0)perror("");
+      else cout << "directory created successfully." << endl;
     }
   }
   return;

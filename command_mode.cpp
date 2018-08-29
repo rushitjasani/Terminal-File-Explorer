@@ -117,7 +117,8 @@ void my_search(){
 }
 
 /*============================================================
-take relative path and convert to absolute path.
+take relative path and convert to absolute path for internal
+system calls.
 =============================================================*/
 string create_absolute_path(string r_path){
   string abs_path="";

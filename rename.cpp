@@ -9,7 +9,7 @@
 #endif
 
 void my_rename(){
-  if(my_command.size()!=3)printf("Improper Arguments.");
+  if(my_command.size()!=3)printf("Improper Arguments\n");
   else{
       string old = create_absolute_path(my_command[1]);
       string new_ = create_absolute_path(my_command[2]);

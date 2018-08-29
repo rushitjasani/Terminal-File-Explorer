@@ -12,7 +12,7 @@ void my_move(){
   my_copy();
   my_command.pop_back();
 
-  if(my_command.size()<2)printf("too few args");
+  if(my_command.size()<2)printf("too few arguments\n");
   else{
     for(unsigned int i=1;i<my_command.size();i++){
       string d_path = create_absolute_path(my_command[i]);

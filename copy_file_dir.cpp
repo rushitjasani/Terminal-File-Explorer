@@ -29,6 +29,7 @@ void file_copy(string from, string to){
   chmod(to.c_str(),from_stat.st_mode);
   fclose(from_f);
   fclose(to_f);
+  return;
 }
 void directory_copy(string from, string to){
   DIR *dp;
@@ -59,7 +60,7 @@ void directory_copy(string from, string to){
   return;
 }
 void my_copy(){
-  if(my_command.size() < 3)printf("improper arguments");
+  if(my_command.size() < 3)printf("too few arguments\n");
   else{
     string dest_folder = create_absolute_path(my_command[my_command.size()-1]);
     for(unsigned int i=1;i<my_command.size()-1;i++){

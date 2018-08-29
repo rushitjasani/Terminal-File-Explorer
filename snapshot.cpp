@@ -40,12 +40,14 @@ void snapshot_file(string d_path, string p_path){
 
 }
 void snapshot(){
-  if(my_command.size() != 3)printf("improper arguments");
+  if(my_command.size() != 3)printf("improper arguments\n");
   else{
     string d_path = create_absolute_path(my_command[1]);
     string file_path = create_absolute_path(my_command[2]);
     fout.open(file_path);
     snapshot_file(d_path,".");
     fout.close();
+    cout << "snapshot saved" << endl;
   }
+  return;
 }
