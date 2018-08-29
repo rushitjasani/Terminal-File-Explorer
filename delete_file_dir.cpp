@@ -10,12 +10,12 @@
 
 
 void delete_file(){
-  if(my_command.size() < 2) printf("too few arguments");
+  if(my_command.size() < 2) printf("too few arguments\n");
   else{
     for(unsigned int i=1;i<my_command.size();i++){
       string remove_path = create_absolute_path(my_command[i]);
       if(remove(remove_path.c_str()) != 0)perror("");
-      else cout << "Done" << endl;
+      else cout << "Deleted" << remove_path << endl;
     }
   }
   return;
@@ -48,7 +48,7 @@ void delete_recursive(string d_path){
   return;
 }
 void delete_dir(){
-  if(my_command.size()<2)printf("too few args");
+  if(my_command.size()<2)printf("too few arguments\n");
   else{
     for(unsigned int i=1;i<my_command.size();i++){
       string d_path = create_absolute_path(my_command[i]);
