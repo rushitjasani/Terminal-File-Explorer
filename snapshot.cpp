@@ -23,7 +23,6 @@ void snapshot_file(string d_path, string p_path){
       if(strcmp(d->d_name,".")==0 || strcmp(d->d_name,"..")==0) continue;
       else{
         string name = string(d->d_name);
-        if(name[0] == '.') continue;
         fout << name << endl;
         string tmp_path = d_path + "/" + name;
         stat(tmp_path.c_str(),&sb);

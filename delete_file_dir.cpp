@@ -14,8 +14,8 @@ void delete_file(){
   else{
     for(unsigned int i=1;i<my_command.size();i++){
       string remove_path = create_absolute_path(my_command[i]);
-      if(remove(remove_path.c_str()) != 0)show_error();
-      else show_success();
+      if(remove(remove_path.c_str()) != 0)perror("");
+      else cout << "Done" << endl;
     }
   }
   return;

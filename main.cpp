@@ -24,5 +24,5 @@ int main(int argc, char **argv){
   listdir(root);                                 //list directories inside root.
   enableNCanon();                                //enable non-canon mode.
   return 0;
-  
+
 }

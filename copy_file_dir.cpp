@@ -11,8 +11,14 @@
 void file_copy(string from, string to){
   FILE *from_f,*to_f;
   char c;
-  if((from_f = fopen(from.c_str(),"r")) == 0 )return;
-  if((to_f = fopen(to.c_str(),"w")) == 0)return;
+  if((from_f = fopen(from.c_str(),"r")) == NULL ){
+    perror("");
+    return;
+  }
+  if((to_f = fopen(to.c_str(),"w")) == NULL){
+    perror("");
+    return;
+  }
   while(!feof(from_f)){
     c = getc(from_f);
     putc(c,to_f);
@@ -64,7 +70,10 @@ void my_copy(){
       stat(from_path.c_str(), &sb);
       int isDir =  S_ISDIR(sb.st_mode);
       if(isDir){
-        mkdir(to_path.c_str(),0755);
+        if(mkdir(to_path.c_str(),0755) != 0){
+            perror("");
+            return;
+        }
         //check and set permission as prev folder.
         directory_copy(from_path,to_path);
       }

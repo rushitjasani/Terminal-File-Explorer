@@ -11,6 +11,13 @@
 string parent = "..";
 string current = ".";
 
+void reset_curser_top(){
+  cx = 1;
+  cy = 1;
+  cur_window = 0;
+  CURSER;
+}
+
 void enableNCanon(){
   //getting the initial terminal settings
   tcgetattr(STDIN_FILENO, &raw);
@@ -45,10 +52,11 @@ void enableNCanon(){
       else if(ch==127)            BackspaceKey();
       else if(ch == 10)           EnterKey();
       else if(ch == ':'){
-          command_mode();
+          int ret = command_mode();
           cx = 1;
           CURSER;
-          listdir(cur_dir);
+          if(ret == 2) continue;
+          else listdir(cur_dir);
       }
       else if(ch == 'q'){
         write(STDOUT_FILENO, "\x1b[2J", 4);
@@ -86,8 +94,7 @@ void DownArrow(){
 }
 
 void RightArrow(){
-  cx = 1;
-  CURSER;
+  reset_curser_top();
   if(!forw_stack.empty()){
       string p = forw_stack.top();
       forw_stack.pop();
@@ -98,8 +105,7 @@ void RightArrow(){
 }
 
 void LeftArrow(){
-  cx = 1;
-  CURSER;
+  reset_curser_top();
   if(back_stack.size() > 1){
       string p = back_stack.top();
       forw_stack.push(p);
@@ -116,8 +122,7 @@ void LeftArrow(){
 }
 
 void HomeKey(){
-  cx = 1;
-  CURSER;
+  reset_curser_top();
   strcpy(cur_dir,root);
   back_stack.push(cur_dir);
   while(!forw_stack.empty()) forw_stack.pop();
@@ -125,8 +130,7 @@ void HomeKey(){
 }
 
 void BackspaceKey(){
-  cx = 1;
-  CURSER;
+  reset_curser_top();
   if((strcmp(cur_dir,root)) != 0 ){
     string s_name = SplitFilename(string(cur_dir));
     strcpy(cur_dir,s_name.c_str());
@@ -139,9 +143,8 @@ void BackspaceKey(){
 void EnterKey(){
   if(dlist[cur_window+cx-1] == current){
     // if selected directory is '.' .
-        cx = 1;
-        cur_window = 0;
-        listdir(cur_dir);
+    reset_curser_top();
+    listdir(cur_dir);
   }
   else if(dlist[cur_window+cx-1] == parent ){
     // if selected directory is '..' .
@@ -150,8 +153,7 @@ void EnterKey(){
     strcpy(cur_dir,s_name.c_str());
     back_stack.push(cur_dir);
     while(!forw_stack.empty()) forw_stack.pop();
-    cx = 1;
-    cur_window = 0;
+    reset_curser_top();
     listdir(cur_dir);
   }
   else{
@@ -173,18 +175,17 @@ void EnterKey(){
     stat(f_path, &sb);
     int isDir =  S_ISDIR(sb.st_mode);
     if(isDir){
-      cx = 1;
-      cur_window = 0;
+      reset_curser_top();
       listdir(f_path);
     }
     else{
-      //if FILE then open by xdg-open.
       back_stack.pop();
       string top = back_stack.top();
       strcpy(cur_dir,top.c_str());
-      string op = "bash -c 'xdg-open " + string(f_path) + "' 2> /dev/null ";
-      system(op.c_str());
-      CURSER;
+      pid_t pid = fork();
+      if(pid == 0){
+        execlp("xdg-open","xdg-open",f_path,NULL);
+      }
     }
   }
 }

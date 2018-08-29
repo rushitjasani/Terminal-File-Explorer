@@ -8,7 +8,8 @@
 #include <unistd.h>
 #include<sys/ioctl.h>
 #include <fcntl.h>
-#include <pwd.h>  //for username and groupname from userid and grpid.
+#include <pwd.h>
+#include<grp.h>        //for username and groupname from userid and grpid.
 using namespace std;
 
 #ifndef MYHEADER_H
@@ -27,7 +28,7 @@ void RightArrow();
 void HomeKey();
 void EnterKey();
 void BackspaceKey();
-void command_mode();
+int command_mode();
 void split_command();
 void function_call();
 void my_copy();
@@ -45,5 +46,4 @@ void my_search();
 void snapshot_file(string, string);
 void snapshot();
 string create_absolute_path(string);
-void show_error();
-void show_success();
+void reset_curser_top();
