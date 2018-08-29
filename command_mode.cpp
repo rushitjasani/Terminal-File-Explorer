@@ -37,10 +37,12 @@ void command_mode(){
         break;
       }
       else if(ch == 127){
-        cy--;
-        CURSER;
-        printf("\x1b[0K");
-        command_string.pop_back();
+        if(cy>2){
+          cy--;
+          CURSER;
+          printf("\x1b[0K");
+          command_string.pop_back();
+        }
       }
       else{
         cout << ch;
@@ -69,50 +71,6 @@ void show_success(){
   return;
 }
 
-void my_copy(){}
-void my_move(){}
-void my_rename(){
-  if(my_command.size()!=3)printf("Improper Arguments.");
-  else{
-      string old = create_absolute_path(my_command[1]);
-      string new_ = create_absolute_path(my_command[2]);
-      if(rename(old.c_str(),new_.c_str()) != 0) show_error();
-      else show_success();
-  }
-  return;
-}
-void create_file(){
-  if(my_command.size()!=3)printf("Improper Arguments.");
-  else{
-      string dest_path = create_absolute_path(my_command[2]);
-      dest_path = dest_path + "/" + my_command[1];
-      FILE *file_create;
-      file_create = fopen(dest_path.c_str(),"w");
-      if(file_create == NULL) show_error();
-      else show_success();
-      fclose(file_create);
-  }
-  return;
-}
-void create_dir(){
-  if(my_command.size() != 3) printf("Improper Arguments.");
-  else{
-    string dest_path = create_absolute_path(my_command[2]) + "/" + my_command[1];
-    if(mkdir(dest_path.c_str(),0755) != 0)show_error();
-    else show_success();
-  }
-  return;
-}
-void delete_file(){
-  if(my_command.size() != 2) printf("Improper Arguments.");
-  else{
-      string remove_path = create_absolute_path(my_command[1]);
-      if(remove(remove_path.c_str()) != 0)show_error();
-      else show_success();
-  }
-  return;
-}
-void delete_dir(){}
 void my_goto(){
   if(my_command.size() != 2) printf("Improper Arguments.");
   else{
@@ -123,7 +81,6 @@ void my_goto(){
   return;
 }
 void my_search(){}
-void snapshot(){}
 
 /*============================================================
 take relative path and convert to absolute path.
@@ -137,7 +94,7 @@ string create_absolute_path(string r_path){
   else if(r_path[0] == '/'){
     abs_path = string(root) + r_path;
   }
-  else if(r_path[0] == '.'){
+  else if(r_path[0] == '.' && r_path[1] == '/' ){
     abs_path = string(cur_dir) + r_path.substr(1,r_path.length());
   }
   else{

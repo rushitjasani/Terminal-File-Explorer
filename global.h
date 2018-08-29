@@ -20,3 +20,4 @@ extern int cur_window;
 extern struct winsize terminal;
 extern struct termios raw, newraw;
 extern vector< string > my_command;
+extern ofstream fout;

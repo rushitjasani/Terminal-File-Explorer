@@ -46,6 +46,8 @@ void enableNCanon(){
       else if(ch == 10)           EnterKey();
       else if(ch == ':'){
           command_mode();
+          cx = 1;
+          CURSER;
           listdir(cur_dir);
       }
       else if(ch == 'q'){
@@ -84,6 +86,8 @@ void DownArrow(){
 }
 
 void RightArrow(){
+  cx = 1;
+  CURSER;
   if(!forw_stack.empty()){
       string p = forw_stack.top();
       forw_stack.pop();
@@ -94,6 +98,8 @@ void RightArrow(){
 }
 
 void LeftArrow(){
+  cx = 1;
+  CURSER;
   if(back_stack.size() > 1){
       string p = back_stack.top();
       forw_stack.push(p);
@@ -110,6 +116,8 @@ void LeftArrow(){
 }
 
 void HomeKey(){
+  cx = 1;
+  CURSER;
   strcpy(cur_dir,root);
   back_stack.push(cur_dir);
   while(!forw_stack.empty()) forw_stack.pop();
@@ -117,6 +125,8 @@ void HomeKey(){
 }
 
 void BackspaceKey(){
+  cx = 1;
+  CURSER;
   if((strcmp(cur_dir,root)) != 0 ){
     string s_name = SplitFilename(string(cur_dir));
     strcpy(cur_dir,s_name.c_str());
@@ -161,12 +171,13 @@ void EnterKey(){
     //check if selected file is FILE or DIRECTORY.
     struct stat sb;
     stat(f_path, &sb);
-    if( S_ISDIR(sb.st_mode) ){
+    int isDir =  S_ISDIR(sb.st_mode);
+    if(isDir){
       cx = 1;
       cur_window = 0;
       listdir(f_path);
     }
-    else if( S_ISREG(sb.st_mode) ){
+    else{
       //if FILE then open by xdg-open.
       back_stack.pop();
       string top = back_stack.top();
