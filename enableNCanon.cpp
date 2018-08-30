@@ -17,16 +17,16 @@ void reset_curser_top(){
   cur_window = 0;
   CURSER;
 }
-
+bool search_flag=false;
 void enableNCanon(){
   //getting the initial terminal settings
   tcgetattr(STDIN_FILENO, &raw);
   newraw = raw;
 
   //changing ICANON for entering Non Canonical mode.
-  newraw.c_lflag &= ~ICANON;
-  newraw.c_lflag &= ~ECHO;
-
+  newraw.c_lflag &= ~(ICANON | ECHO);
+  // newraw.c_cc[VMIN] = 1;
+  // newraw.c_cc[VTIME] = 0;
   //set new terminal settings.
   if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &newraw) != 0)
     fprintf(stderr,"Could not set attributes\n");
@@ -55,7 +55,10 @@ void enableNCanon(){
           int ret = command_mode();
           cx = 1;
           CURSER;
-          if(ret == 2) continue;
+          if(ret == 2) {
+              search_flag = true;
+              continue;
+          }
           else listdir(cur_dir);
       }
       else if(ch == 'q'){
@@ -138,6 +141,9 @@ void BackspaceKey(){
     while(!forw_stack.empty()) forw_stack.pop();
     listdir(cur_dir);
   }
+  else{
+    printf("Hello");
+  }
 }
 
 void EnterKey(){
@@ -159,15 +165,35 @@ void EnterKey(){
   else{
     // if selected directory is except '.' and '..'.
     // taking file name and making full path
-    string cur_d = "/" + dlist[cur_window+cx-1];
-    CURSER;
-    char *p_path = cur_dir;
-    char *f_path = new char[cur_d.length() + strlen(p_path) + 1];
-    strcpy(f_path,p_path);
-    strcat(f_path, cur_d.c_str());
-    strcpy(cur_dir,f_path);
+    char *p_path;
+    char *f_path;
+    if(!search_flag){
+      string cur_d = "/" + dlist[cur_window+cx-1];
+      CURSER;
+      p_path = cur_dir;
+      f_path = new char[cur_d.length() + strlen(p_path) + 1];
+      strcpy(f_path,p_path);
+      strcat(f_path, cur_d.c_str());
+      strcpy(cur_dir,f_path);
+    }
+    else{
+        string search_path = create_absolute_path(dlist[cur_window+cx-1]);
+        strcpy(cur_dir, search_path.c_str());
+        f_path = new char[strlen(cur_dir)+5];
+        strcpy(f_path,cur_dir);
+        //cout << cur_dir << endl;
+        // struct stat sb1;
+        // stat(search_path.c_str, &sb1);
+        // int isDir =  S_ISDIR(sb.st_mode);
+        // if(isDir){
+        //   strcpy(cur_dir,search_path.c_str());
+        // }
+        // else{
+        //
+        // }
+    }
     //Maintaing forward and backward stacks.
-    back_stack.push(f_path);
+    back_stack.push(cur_dir);
     //clear forward stack if entering in any directory manually.
     while(!forw_stack.empty()) forw_stack.pop();
     //check if selected file is FILE or DIRECTORY.
@@ -176,7 +202,7 @@ void EnterKey(){
     int isDir =  S_ISDIR(sb.st_mode);
     if(isDir){
       reset_curser_top();
-      listdir(f_path);
+      listdir(cur_dir);
     }
     else{
       back_stack.pop();
@@ -187,5 +213,6 @@ void EnterKey(){
         execlp("xdg-open","xdg-open",f_path,NULL);
       }
     }
+    search_flag = false;
   }
 }
