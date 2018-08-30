@@ -115,9 +115,10 @@ void my_search(){
   else{
     string name = my_command[1];
     std::vector<string> search_result;
+    back_stack.push(cur_dir);
     search_recursive(cur_dir,name,search_result);
     if(search_result.size() == 0){
-      printf("No result.");
+      cout << "No Match Found in " << cur_dir << endl;
       return;
     }
     write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen

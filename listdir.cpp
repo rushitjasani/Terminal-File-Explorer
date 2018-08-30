@@ -13,8 +13,6 @@ int listdir(const char *path)
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
   term_row = terminal.ws_row - 2 ;
   write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
-  cy = 0;
-  CURSER;
   struct dirent *d;
   DIR *dp;
   dp = opendir(path);
@@ -22,9 +20,7 @@ int listdir(const char *path)
     perror("opendir");
     return -1;
   }
-
   dlist.clear();
-
   while((d = readdir(dp))){
     if(strcmp(path, root) == 0){
       strcpy(cur_dir,root);
@@ -33,8 +29,15 @@ int listdir(const char *path)
       dlist.push_back(d->d_name);
   }
   sort(dlist.begin(),dlist.end());
+  update_list();
+  closedir(dp);
+  return 0;
+}
+void update_list(){
+  write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
+  cy = 1;
+  CURSER;
   int vecsize = dlist.size();
-
   int from = cur_window;
   int to;
   if((unsigned)vecsize <= term_row) to = vecsize-1;
@@ -46,8 +49,7 @@ int listdir(const char *path)
       display(t.c_str());
     }
   CURSER;
-  closedir(dp);
-  return 0;
+  return;
 }
 void display(const char *dirName){
   struct stat sb;

@@ -47,3 +47,4 @@ void snapshot_file(string, string);
 void snapshot();
 string create_absolute_path(string);
 void reset_curser_top();
+void update_list();

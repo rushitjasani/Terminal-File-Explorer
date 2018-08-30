@@ -77,7 +77,8 @@ void UpArrow(){
   }
   else if(cx == 1 && cx+cur_window > 1 ){
     cur_window--;
-    listdir(cur_dir);
+    //listdir(cur_dir);
+    update_list();
     CURSER;
   }
 }
@@ -91,7 +92,8 @@ void DownArrow(){
   }
   else if(cx > term_row && cx+cur_window < dlist.size() ){
     cur_window++;
-    listdir(cur_dir);
+    //listdir(cur_dir);
+    update_list();
     CURSER;
   }
 }
@@ -133,6 +135,7 @@ void HomeKey(){
 }
 
 void BackspaceKey(){
+  if(search_flag) return;
   reset_curser_top();
   if((strcmp(cur_dir,root)) != 0 ){
     string s_name = SplitFilename(string(cur_dir));
@@ -181,16 +184,6 @@ void EnterKey(){
         strcpy(cur_dir, search_path.c_str());
         f_path = new char[strlen(cur_dir)+5];
         strcpy(f_path,cur_dir);
-        //cout << cur_dir << endl;
-        // struct stat sb1;
-        // stat(search_path.c_str, &sb1);
-        // int isDir =  S_ISDIR(sb.st_mode);
-        // if(isDir){
-        //   strcpy(cur_dir,search_path.c_str());
-        // }
-        // else{
-        //
-        // }
     }
     //Maintaing forward and backward stacks.
     back_stack.push(cur_dir);
@@ -203,6 +196,7 @@ void EnterKey(){
     if(isDir){
       reset_curser_top();
       listdir(cur_dir);
+      search_flag = false;
     }
     else{
       back_stack.pop();
@@ -213,6 +207,6 @@ void EnterKey(){
         execlp("xdg-open","xdg-open",f_path,NULL);
       }
     }
-    search_flag = false;
+
   }
 }
