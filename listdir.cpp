@@ -7,9 +7,11 @@
 #include "global.h"
 #endif
 
-//list directory in currnet dir.
-int listdir(const char *path)
-{
+/*============================================================
+takes directory path, opens it and store all it's content
+into dlist vector for display.
+=============================================================*/
+int listdir(const char *path){
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
   term_row = terminal.ws_row - 2 ;
   write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
@@ -30,9 +32,18 @@ int listdir(const char *path)
   }
   sort(dlist.begin(),dlist.end());
   update_list();
+  cx = 1;
+  //cy = 1;
+  CURSER;
+  //reset_curser_top();
   closedir(dp);
   return 0;
 }
+/*============================================================
+takes each name from dlist and calls display() for output.
+this method also helps in scrolling as it prints contents
+mapped by cursor position and relative to terminal size.
+=============================================================*/
 void update_list(){
   write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
   cy = 1;
@@ -42,28 +53,29 @@ void update_list(){
   int to;
   if((unsigned)vecsize <= term_row) to = vecsize-1;
   else to = term_row+cur_window;
-  //cout << from << "##" << to << "##" << vecsize;
-  //sleep(5);
   for(int i=from; i <= to; i++){
       string t = dlist[i];
       display(t.c_str());
     }
-  CURSER;
   return;
 }
+/*============================================================
+shows long listing for given path.
+=============================================================*/
 void display(const char *dirName){
+  cy = 0;
   struct stat sb;
   string abs_path = create_absolute_path(dirName);
   stat(abs_path.c_str(), &sb);
   switch (sb.st_mode & S_IFMT) {
-    case S_IFBLK:  printf("b");                break;
-    case S_IFCHR:  printf("c");                break;
-    case S_IFDIR:  printf("d");                break;
-    case S_IFIFO:  printf("p");                break;
-    case S_IFLNK:  printf("l");                break;
-    case S_IFREG:  printf("-");                break;
-    case S_IFSOCK: printf("s");                break;
-    default:       printf("-");                break;
+    case S_IFBLK:  printf("b"); break; //block file
+    case S_IFCHR:  printf("c"); break; //device file
+    case S_IFDIR:  printf("d"); break; //directory
+    case S_IFIFO:  printf("p"); break; //FIFO file
+    case S_IFLNK:  printf("l"); break; //link
+    case S_IFREG:  printf("-"); break; //normal file
+    case S_IFSOCK: printf("s"); break; //socket file
+    default:       printf("-"); break;
     }
   printf( (sb.st_mode & S_IRUSR ) ? "r" : "-" );
   printf( (sb.st_mode & S_IWUSR ) ? "w" : "-" );
@@ -74,23 +86,29 @@ void display(const char *dirName){
   printf( (sb.st_mode & S_IROTH ) ? "r" : "-" );
   printf( (sb.st_mode & S_IWOTH ) ? "w" : "-" );
   printf( (sb.st_mode & S_IXOTH ) ? "x" : "-" );
-  printf("%8lu",sb.st_nlink);
+  cy += 10;
+  cy += printf("%4lu ",sb.st_nlink);
 
   struct passwd *get_username;
   get_username = getpwuid(sb.st_uid);
   string uname = get_username->pw_name;
-  printf("\t%s",uname.c_str());
+  cy += printf("%-10s ",uname.c_str());
 
   struct group *get_grpname;
   get_grpname = getgrgid(sb.st_gid);
   string gname = get_grpname->gr_name;
-  printf("\t%s",gname.c_str());
+  cy += printf("%-10s ",gname.c_str());
 
   long long x = sb.st_size;
-  if(x > 1024) printf("\t%8lld K",x/1024);
-  else printf("\t%8lld B",x);
+  if(x >= (1<<30)) cy += printf("%4lldG ",x/(1<<30));
+  else if(x >= (1<<20)) cy += printf("%4lldM ",x/(1<<20));
+  else if(x >= (1<<10)) cy += printf("%4lldK ",x/(1<<10));
+  else cy += printf("%4lldB ",x);
   string m_time = string(ctime(&sb.st_mtime));
   m_time = m_time.substr(4,20);
-  printf("\t  %s",m_time.c_str());
-  printf("  %-20s\n",dirName);
+  cy += printf("%-20s ",m_time.c_str());
+  if(isDirectory(abs_path))printf("%c[33;40m",27);
+  printf(" %-20s\n",dirName);
+  if(isDirectory(abs_path))printf("%c[0m",27);
+  cy++;
 }

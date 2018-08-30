@@ -7,7 +7,10 @@
 #define GLOBAL_H
 #include "global.h"
 #endif
-
+/*============================================================
+simple copy sunction which takes two paths.
+managed to keep owners and permission intact.
+=============================================================*/
 void file_copy(string from, string to){
   FILE *from_f,*to_f;
   char c;
@@ -31,6 +34,10 @@ void file_copy(string from, string to){
   fclose(to_f);
   return;
 }
+/*============================================================
+this function takes directory as path and create replica
+of the folder in Destination folder.
+=============================================================*/
 void directory_copy(string from, string to){
   DIR *dp;
   dp = opendir(from.c_str());
@@ -44,12 +51,12 @@ void directory_copy(string from, string to){
     else{
       string from_path = from + "/" + string(d->d_name);
       string to_path = to + "/" + string(d->d_name);
-      struct stat sb;
-      stat(from_path.c_str(), &sb);
-      int isDir =  S_ISDIR(sb.st_mode);
-      if(isDir){
-          mkdir(to_path.c_str(),0755);
-          directory_copy(from_path,to_path);
+      if(isDirectory(from_path)){
+          if(mkdir(to_path.c_str(),0755) == -1){
+              perror("");
+              return;
+          }
+          else directory_copy(from_path,to_path);
       }
       else{
           file_copy(from_path.c_str(),to_path.c_str());
@@ -59,23 +66,28 @@ void directory_copy(string from, string to){
   closedir(dp);
   return;
 }
-void my_copy(){
+/*============================================================
+this command performs copy on multiple arguments one by one
+by calling respective directory_copy or file_copy function.
+eg : copy <f1> <f2> <d1> <f3> <Destination Folder>
+=============================================================*/
+int my_copy(){
   if(my_command.size() < 3)printf("too few arguments\n");
   else{
     string dest_folder = create_absolute_path(my_command[my_command.size()-1]);
+    if(!isDirectory(dest_folder)){
+        cout << "Destination is not a folder." << endl;
+        return 1;
+    }
     for(unsigned int i=1;i<my_command.size()-1;i++){
       string from_path = create_absolute_path(my_command[i]);
       size_t found=from_path.find_last_of("/\\");
       string to_path = dest_folder + "/" + from_path.substr(found+1,from_path.length()-found);
-      struct stat sb;
-      stat(from_path.c_str(), &sb);
-      int isDir =  S_ISDIR(sb.st_mode);
-      if(isDir){
+      if(isDirectory(from_path)){
         if(mkdir(to_path.c_str(),0755) != 0){
             perror("");
-            return;
+            return 1;
         }
-        //check and set permission as prev folder.
         directory_copy(from_path,to_path);
       }
       else{
@@ -83,5 +95,5 @@ void my_copy(){
       }
     }
   }
-  return;
+  return 0;
 }

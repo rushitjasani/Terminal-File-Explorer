@@ -9,18 +9,15 @@
 #endif
 
 bool goto_flag,search_flag_c;
+
+/*============================================================
+start point of command_mode.
+Type command, erase with Backspace, go back to Normal Mode
+by ESC, Up-Down-Left-Right are disabled.
+returns 1 if user returns with Goto command.
+returns 2 if user returns with search command.
+=============================================================*/
 int command_mode(){
-  //newraw.c_lflag &= ~(ECHO | ICANON);
-  // newraw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
-  // newraw.c_cflag &= ~(CSIZE | PARENB);
-  newraw.c_cflag |= CS8;
-  // newraw.c_oflag &= ~(OPOST);
-  newraw.c_cc[VMIN] = 3;
-  newraw.c_cc[VTIME] = 0.1;
-  /*if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &newraw) != 0){
-      fprintf(stderr,"Could not set attributes\n");
-  }
-  else{*/
     while(1){
       goto_flag = false;
       search_flag_c = false;
@@ -78,7 +75,10 @@ int command_mode(){
   return 0;
 }
 
-
+/*============================================================
+lists the contents at given path and switch back to
+normal mode.
+=============================================================*/
 void my_goto(){
   if(my_command.size() != 2) printf("Improper Arguments.");
   else{
@@ -89,6 +89,10 @@ void my_goto(){
   }
   return;
 }
+
+/*============================================================
+Helper function to my_search() for recursion.
+=============================================================*/
 void search_recursive(string r_path, string name, vector<string> &search_result){
   DIR *dp;
   dp = opendir(r_path.c_str());
@@ -101,20 +105,19 @@ void search_recursive(string r_path, string name, vector<string> &search_result)
     if(strcmp(d->d_name,".")==0 || strcmp(d->d_name,"..")==0) continue;
     else{
       string r_path_1 = r_path + "/" + string(d->d_name);
-      //string p_path_1 = p_path + "/" + string(d->d_name);
-      struct stat sb;
-      stat(r_path_1.c_str(), &sb);
-      if(strcmp(d->d_name,name.c_str()) == 0){
+      if(strcmp(d->d_name,name.c_str()) == 0)
         search_result.push_back(r_path_1);
-      }
-      int isDir =  S_ISDIR(sb.st_mode);
-      if(isDir){
-          search_recursive(r_path_1,name,search_result);
-      }
+      if(isDirectory(r_path_1))
+        search_recursive(r_path_1,name,search_result);
     }
   }
   return;
 }
+
+/*============================================================
+search in current directory and gives search result.
+mode changes to normal mode.
+=============================================================*/
 void my_search(){
   if(my_command.size() != 2) printf("Error");
   else{
@@ -126,63 +129,46 @@ void my_search(){
       cout << "No Match Found in " << cur_dir << endl;
       return;
     }
-    write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
+    write(STDOUT_FILENO, "\x1b[2J", 4);
     reset_curser_top();
+    cy = 1;
+    CURSER;
     int vecsize = search_result.size();
     int root_len = strlen(root);
     for(int i=0; i < vecsize; i++){
         string t = search_result[i];
         t = t.substr(root_len, t.length()-root_len);
         search_result[i] = t;
-        //t = create_absolute_path(t);
         display(t.c_str());
       }
       dlist.clear();
       dlist = search_result;
       search_flag_c = true;
       CURSER;
-      //for(auto i:search_result)cout << i << endl;
   }
   return;
 }
 
 /*============================================================
-take relative path and convert to absolute path for internal
-system calls.
-=============================================================*/
-string create_absolute_path(string r_path){
-  string abs_path="";
-  if(r_path[0] == '~'){
-    r_path = r_path.substr(1,r_path.length());
-    abs_path = string(root) + r_path;
-  }
-  else if(r_path[0] == '/'){
-    abs_path = string(root) + r_path;
-  }
-  else if(r_path[0] == '.' && r_path[1] == '/' ){
-    abs_path = string(cur_dir) + r_path.substr(1,r_path.length());
-  }
-  else{
-    abs_path = string(cur_dir)+"/"+r_path;
-  }
-  return abs_path;
-}
-/*============================================================
 take command string, split it and put it in string vector.
+use '\' as escape sequence to use space or other char in path.
 =============================================================*/
 void split_command(){
   string tmp="";
   unsigned int i=0;
   cout << endl;
   for(;i<=command_string.size();i++){
-    if(command_string[i] == ' ' && i>0  && command_string[i-1] != '\\' ){
+    //&& i>0  && command_string[i-1] != '\\'
+    if(command_string[i] == ' '){
       my_command.push_back(tmp);
       tmp = "";
     }
-    else if(command_string[i] != '\\') tmp+=command_string[i];
+    else if(command_string[i]=='\\') tmp+=command_string[++i];
+    else tmp+=command_string[i];
   }
   return;
 }
+
 /*============================================================
 calls various functions based on first argument of command.
 =============================================================*/

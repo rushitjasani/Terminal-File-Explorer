@@ -16,7 +16,7 @@ std::stack <string> forw_stack;
 vector< string > my_command;
 std::vector<char> command_string;
 unsigned int cx=1;
-unsigned int cy=0;
+unsigned int cy=1;
 unsigned int term_row;
 int cur_window = 0;
 ofstream fout;

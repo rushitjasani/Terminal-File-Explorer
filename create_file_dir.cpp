@@ -7,7 +7,11 @@
 #define GLOBAL_H
 #include "global.h"
 #endif
-
+/*============================================================
+create file at path provided by user.
+user can create multiple files at time also.
+eg : create_file <f1> <f2> <f3> <Destination Folder>
+=============================================================*/
 void create_file(){
   if(my_command.size() < 3)printf("too few arguments:\n");
   else{
@@ -15,7 +19,7 @@ void create_file(){
     FILE *file_create;
     for(unsigned int i=1;i<my_command.size()-1;i++){
       string dest_path = dest_folder + "/" + my_command[i];
-      file_create = fopen(dest_path.c_str(),"w");
+      file_create = fopen(dest_path.c_str(),"w+");
       if(file_create == NULL) perror("");
       else cout << "file created" << endl;
       fclose(file_create);
@@ -23,11 +27,20 @@ void create_file(){
   }
   return;
 }
+/*============================================================
+create directory at path provided by user.
+user can create multiple directory at a time also.
+eg : create_dir <d1> <d2> <d3> <Destination Folder>
+=============================================================*/
 void create_dir(){
   if(my_command.size() < 3) printf("too few arguments\n");
   else{
     string dest_folder =create_absolute_path(my_command[my_command.size()-1]);
-    cout << dest_folder << endl;
+    if(!isDirectory(dest_folder)) {
+        cout << "Destination is not folder." << endl;
+        return;
+    }
+    //cout << dest_folder << endl;
     for(unsigned int i=1;i<my_command.size()-1;i++){
       string dest_path = dest_folder + "/" + my_command[i];
 

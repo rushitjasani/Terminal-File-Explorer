@@ -11,47 +11,37 @@
 string parent = "..";
 string current = ".";
 
-void reset_curser_top(){
-  cx = 1;
-  cy = 1;
-  cur_window = 0;
-  CURSER;
-}
 bool search_flag=false;
+/*============================================================
+method to enter into Non-Canonical mode.
+=============================================================*/
 void enableNCanon(){
   //getting the initial terminal settings
   tcgetattr(STDIN_FILENO, &raw);
   newraw = raw;
-
   //changing ICANON for entering Non Canonical mode.
   newraw.c_lflag &= ~(ICANON | ECHO);
-  // newraw.c_cc[VMIN] = 1;
-  // newraw.c_cc[VTIME] = 0;
   //set new terminal settings.
   if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &newraw) != 0)
     fprintf(stderr,"Could not set attributes\n");
   else{
-    char ch;
+    char ch[3]={0};
     while(1){
       unsigned int tmp = terminal.ws_row;
-      printf("%c[%d;%dH",27,tmp,cy);
-      printf(":::::Normal Mode:::::");
+      //cy = 1;
+      printf("%c[%d;%dH",27,tmp,1);
+      printf("::Normal Mode::");
       CURSER;
-      ch=cin.get();
-      //check for first char and if ESC then go inside loop.
-      if(ch==27){
-        ch=cin.get(); // scans [ .
-        ch=cin.get(); // scans third char of escape sequence.
-        if(ch=='A')               UpArrow();
-        else if(ch=='B')          DownArrow();
-        else if(ch=='C')          RightArrow();
-        else if(ch=='D')          LeftArrow();
-        else                      continue;
-      }
-      else if(ch=='H' || ch=='h') HomeKey();
-      else if(ch==127)            BackspaceKey();
-      else if(ch == 10)           EnterKey();
-      else if(ch == ':'){
+      fflush(0);
+      if(read(STDIN_FILENO,ch,3) == 0) continue;
+      else if(ch[0] == 27 && ch[1]=='[' && ch[2] == 'A')  UpArrow();
+      else if(ch[0] == 27 && ch[1]=='[' && ch[2] == 'B')  DownArrow();
+      else if(ch[0] == 27 && ch[1]=='[' && ch[2] == 'C')  RightArrow();
+      else if(ch[0] == 27 && ch[1]=='[' && ch[2] == 'D')  LeftArrow();
+      else if(ch[0]=='H' || ch[0]=='h')                   HomeKey();
+      else if(ch[0]==127)                                 BackspaceKey();
+      else if(ch[0] == 10)                                EnterKey();
+      else if(ch[0] == ':'){
           int ret = command_mode();
           cx = 1;
           CURSER;
@@ -61,14 +51,19 @@ void enableNCanon(){
           }
           else listdir(cur_dir);
       }
-      else if(ch == 'q'){
+      else if(ch[0] == 'q'){
         write(STDOUT_FILENO, "\x1b[2J", 4);
         exit(0);
       }
+      fflush(0);
+      memset(ch,0,3*sizeof(ch[0]));
     }
   }
 }
-
+/*============================================================
+method will handle behaviour when Up arrow key is pressed.
+it also manages variables to map into vector and scroll.
+=============================================================*/
 void UpArrow(){
   if(cx > 1)
   {
@@ -82,9 +77,12 @@ void UpArrow(){
     CURSER;
   }
 }
-
+/*============================================================
+method will handle behaviour when Down arrow key is pressed.
+it also manages variables to map into vector and scroll.
+=============================================================*/
 void DownArrow(){
-  //cout << cx << "##" << cur_window << "##" << dlist.size();
+
   if(cx <= term_row && cx < dlist.size())
   {
     cx++;
@@ -97,7 +95,11 @@ void DownArrow(){
     CURSER;
   }
 }
-
+/*============================================================
+RightArrow method will handle behaviour when Right arrow key is
+pressed. if any path is there in forw_stack then pop it and
+print content of that.
+=============================================================*/
 void RightArrow(){
   reset_curser_top();
   if(!forw_stack.empty()){
@@ -108,7 +110,11 @@ void RightArrow(){
       listdir(cur_dir);
   }
 }
-
+/*============================================================
+LeftArrow method will handle behaviour when Left arrow key is
+pressed. if any path is there in back_stack then pop it and
+print content of that.
+=============================================================*/
 void LeftArrow(){
   reset_curser_top();
   if(back_stack.size() > 1){
@@ -125,7 +131,9 @@ void LeftArrow(){
     listdir(cur_dir);
   }
 }
-
+/*============================================================
+Navigate to Home.
+=============================================================*/
 void HomeKey(){
   reset_curser_top();
   strcpy(cur_dir,root);
@@ -133,7 +141,9 @@ void HomeKey(){
   while(!forw_stack.empty()) forw_stack.pop();
   listdir(cur_dir);
 }
-
+/*============================================================
+Navigate to Parent if exist. (root has no parent :P)
+=============================================================*/
 void BackspaceKey(){
   if(search_flag) return;
   reset_curser_top();
@@ -145,10 +155,13 @@ void BackspaceKey(){
     listdir(cur_dir);
   }
   else{
-    printf("Hello");
+
   }
 }
-
+/*============================================================
+if EnterKey pressed on directory then go to dir. else opens
+file in default application.
+=============================================================*/
 void EnterKey(){
   if(dlist[cur_window+cx-1] == current){
     // if selected directory is '.' .
@@ -190,10 +203,7 @@ void EnterKey(){
     //clear forward stack if entering in any directory manually.
     while(!forw_stack.empty()) forw_stack.pop();
     //check if selected file is FILE or DIRECTORY.
-    struct stat sb;
-    stat(f_path, &sb);
-    int isDir =  S_ISDIR(sb.st_mode);
-    if(isDir){
+    if(isDirectory(f_path)){
       reset_curser_top();
       listdir(cur_dir);
       search_flag = false;

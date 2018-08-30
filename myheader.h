@@ -9,7 +9,7 @@
 #include<sys/ioctl.h>
 #include <fcntl.h>
 #include <pwd.h>
-#include<grp.h>        //for username and groupname from userid and grpid.
+#include<grp.h>
 using namespace std;
 
 #ifndef MYHEADER_H
@@ -17,10 +17,10 @@ using namespace std;
 #endif
 
 
-int listdir(const char *);    //ls function.
-void display(const char *);   //to display like ls -a.
-void enableNCanon();          //to enter into Normal mode.
-string SplitFilename(string );  //returns path to given file or folder.
+int listdir(const char *);
+void display(const char *);
+void enableNCanon();
+string SplitFilename(string );
 void UpArrow();
 void DownArrow();
 void LeftArrow();
@@ -31,7 +31,7 @@ void BackspaceKey();
 int command_mode();
 void split_command();
 void function_call();
-void my_copy();
+int my_copy();
 void file_copy(string, string);
 void directory_copy(string, string);
 void my_move();
@@ -48,3 +48,5 @@ void snapshot();
 string create_absolute_path(string);
 void reset_curser_top();
 void update_list();
+bool isDirectory(string);
+int isFileExist(string);
