@@ -10,8 +10,13 @@
 
 bool goto_flag,search_flag_c;
 int command_mode(){
-  /*newraw.c_cc[VMIN] = 1;
-  newraw.c_cc[VTIME] = 0;*/
+  //newraw.c_lflag &= ~(ECHO | ICANON);
+  // newraw.c_iflag &= ~(BRKINT | ICRNL | INPCK | ISTRIP | IXON);
+  // newraw.c_cflag &= ~(CSIZE | PARENB);
+  newraw.c_cflag |= CS8;
+  // newraw.c_oflag &= ~(OPOST);
+  newraw.c_cc[VMIN] = 3;
+  newraw.c_cc[VTIME] = 0.1;
   /*if(tcsetattr(STDIN_FILENO, TCSAFLUSH, &newraw) != 0){
       fprintf(stderr,"Could not set attributes\n");
   }
@@ -26,21 +31,24 @@ int command_mode(){
       printf(":");
       fflush(0);
       cy++;
-      char ch;
+      char ch[3]={0};
       command_string.clear();
       my_command.clear();
       while(1){
-        //read(STDIN_FILENO,ch,1);
-        //if(ch[0] == 27 && ch[1]==0 && ch[2] == 0){
-        ch = cin.get();
-        if(ch == 27){
+        if(read(STDIN_FILENO,ch,3) == 0) continue;
+        if(ch[0] == 27 && ch[1]==0 && ch[2] == 0){
           cx = 1;
           cy = 1;
           CURSER;
           return 0;
         }
-
-        else if(ch == 10){
+        else if(ch[0] == 27 && ch[1] == '[' && (ch[2] == 'A' || ch[2]=='B')){
+          continue;
+        }
+        else if(ch[0] == 27 && ch[1] == '[' && (ch[2] == 'C' || ch[2]=='D')){
+          continue;
+        }
+        else if(ch[0] == 10 ){
           command_string.push_back(' ');
           split_command();
           function_call();
@@ -48,7 +56,7 @@ int command_mode(){
           if(search_flag_c) return 2;
           break;
         }
-        else if(ch == 127){
+        else if(ch[0] == 127){
           if(cy>2){
             cy--;
             CURSER;
@@ -57,19 +65,16 @@ int command_mode(){
           }
         }
         else{
-          cout << ch;
+          cout << ch[0];
           cy++;
-          command_string.push_back(ch);
+          CURSER;
+          command_string.push_back(ch[0]);
+
         }
+        fflush(0);
+        memset(ch,0,3*sizeof(ch[0]));
       }
     }
-  //}
-  /*else if(ch[0] == 27 && ch[1] == '[' && (ch[2] == 'A' || ch[2]=='B')){
-    continue;
-  }
-  else if(ch[0] == 27 && ch[1] == '[' && (ch[2] == 'C' || ch[2]=='D')){
-    continue;
-  }*/
   return 0;
 }
 
