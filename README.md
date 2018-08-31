@@ -1,6 +1,5 @@
-/*============================================================
-    @author - Rushitkumar Jasani   @rollno - 2018201034
-=============================================================*/
+@author - Rushitkumar Jasani   @rollno - 2018201034
+
 Compilation steps : run makefile in the directory where source file are present.
 to run project : run ./term
 
