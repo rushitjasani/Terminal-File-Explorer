@@ -117,12 +117,12 @@ void display(const char* dirName)
     struct passwd* get_username;
     get_username = getpwuid(sb.st_uid);
     string uname = get_username->pw_name;
-    cy += printf(" %-10s ", uname.c_str());
+    cy += printf(" %10s ", uname.c_str());
 
     struct group* get_grpname;
     get_grpname = getgrgid(sb.st_gid);
     string gname = get_grpname->gr_name;
-    cy += printf("%-10s ", gname.c_str());
+    cy += printf(" %10s ", gname.c_str());
 
     long long x = sb.st_size;
     if (x >= (1 << 30))
@@ -139,7 +139,7 @@ void display(const char* dirName)
     cy += printf(" %-12s ", m_time.c_str());
 
     if (isDirectory(abs_path))
-        printf("%c[33;40m", 27);
+        printf("%c[33m", 27);
     printf(" %-20s\n", dirName);
     if (isDirectory(abs_path))
         printf("%c[0m", 27);

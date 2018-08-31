@@ -24,7 +24,8 @@ void enableNCanon()
     tcgetattr(STDIN_FILENO, &raw);
     newraw = raw;
     //changing ICANON for entering Non Canonical mode.
-    newraw.c_lflag &= ~(ICANON | ECHO);
+    newraw.c_lflag &= ~(ICANON | ECHO | IEXTEN | ISIG);
+    newraw.c_iflag &= ~(BRKINT);
     //set new terminal settings.
     if (tcsetattr(STDIN_FILENO, TCSAFLUSH, &newraw) != 0)
         fprintf(stderr, "Could not set attributes\n");
@@ -66,7 +67,11 @@ void enableNCanon()
             }
             else if (ch[0] == 'q') {
                 write(STDOUT_FILENO, "\x1b[2J", 4);
-                exit(0);
+                tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
+                cx = 1;
+                cy = 1;
+                CURSER;
+                exit(1);
             }
             fflush(0);
             memset(ch, 0, 3 * sizeof(ch[0]));
