@@ -91,12 +91,11 @@ void display(const char *dirName){
   printf( (sb.st_mode & S_IWOTH ) ? "w" : "-" );
   printf( (sb.st_mode & S_IXOTH ) ? "x" : "-" );
   cy += 10;
-  cy += printf("%4lu ",sb.st_nlink);
 
   struct passwd *get_username;
   get_username = getpwuid(sb.st_uid);
   string uname = get_username->pw_name;
-  cy += printf("%-10s ",uname.c_str());
+  cy += printf(" %-10s ",uname.c_str());
 
   struct group *get_grpname;
   get_grpname = getgrgid(sb.st_gid);
@@ -110,8 +109,8 @@ void display(const char *dirName){
   else cy += printf("%4lldB ",x);
 
   string m_time = string(ctime(&sb.st_mtime));
-  m_time = m_time.substr(4,20);
-  cy += printf("%-20s ",m_time.c_str());
+  m_time = m_time.substr(4,12);
+  cy += printf(" %-12s ",m_time.c_str());
 
   if(isDirectory(abs_path))printf("%c[33;40m",27);
   printf(" %-20s\n",dirName);

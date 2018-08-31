@@ -217,7 +217,9 @@ void EnterKey(){
       strcpy(cur_dir,top.c_str());
       pid_t pid = fork();
       if(pid == 0){
+        close(2);
         execlp("xdg-open","xdg-open",f_path,NULL);
+        exit(0);
       }
     }
 
