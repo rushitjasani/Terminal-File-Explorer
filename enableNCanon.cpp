@@ -1,3 +1,6 @@
+/*============================================================
+    @author - Rushitkumar Jasani   @rollno - 2018201034
+=============================================================*/
 #ifndef MYHEADER_H
 #define MYHEADER_H
 #include "myheader.h"

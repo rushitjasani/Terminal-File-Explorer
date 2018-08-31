@@ -1,4 +1,6 @@
-
+/*============================================================
+    @author - Rushitkumar Jasani   @rollno - 2018201034
+=============================================================*/
 #ifndef GLOBAL_H
 #define GLOBAL_H
 #include "global.h"
@@ -18,5 +20,6 @@ std::vector<char> command_string;
 unsigned int cx=1;
 unsigned int cy=1;
 unsigned int term_row;
+unsigned int term_col;
 int cur_window = 0;
 ofstream fout;

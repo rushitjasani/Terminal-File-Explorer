@@ -1,3 +1,6 @@
+/*============================================================
+    @author - Rushitkumar Jasani   @rollno - 2018201034
+=============================================================*/
 #ifndef MYHEADER_H
 #define MYHEADER_H
 #include "myheader.h"
@@ -16,6 +19,7 @@ extern vector <char> command_string;    //to store char by char info in command 
 extern unsigned int cx;                 //curser position x.
 extern unsigned int cy;                 //curser position y.
 extern unsigned int term_row;           //num of row in terminal.
+extern unsigned int term_col;           //num of col in terminal.
 extern int cur_window;                  //helper var in scrolling.
 extern struct winsize terminal;         //to get terminal window config.
 extern struct termios raw, newraw;      //to get terminal configuration.

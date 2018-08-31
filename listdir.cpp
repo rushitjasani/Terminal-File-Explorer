@@ -1,3 +1,6 @@
+/*============================================================
+    @author - Rushitkumar Jasani   @rollno - 2018201034
+=============================================================*/
 #ifndef MYHEADER_H
 #define MYHEADER_H
 #include "myheader.h"
@@ -14,6 +17,7 @@ into dlist vector for display.
 int listdir(const char *path){
   ioctl(STDOUT_FILENO, TIOCGWINSZ, &terminal);
   term_row = terminal.ws_row - 2 ;
+  term_col = terminal.ws_col;
   write(STDOUT_FILENO, "\x1b[2J", 4); //to clear screen
   struct dirent *d;
   DIR *dp;
@@ -104,9 +108,11 @@ void display(const char *dirName){
   else if(x >= (1<<20)) cy += printf("%4lldM ",x/(1<<20));
   else if(x >= (1<<10)) cy += printf("%4lldK ",x/(1<<10));
   else cy += printf("%4lldB ",x);
+
   string m_time = string(ctime(&sb.st_mtime));
   m_time = m_time.substr(4,20);
   cy += printf("%-20s ",m_time.c_str());
+
   if(isDirectory(abs_path))printf("%c[33;40m",27);
   printf(" %-20s\n",dirName);
   if(isDirectory(abs_path))printf("%c[0m",27);
