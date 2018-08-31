@@ -1,29 +1,28 @@
 /*============================================================
     @author - Rushitkumar Jasani   @rollno - 2018201034
 =============================================================*/
-#include<bits/stdc++.h>
-#include<stdio.h>
+#include <bits/stdc++.h>
+#include <stdio.h>
 #include <dirent.h>
-#include<time.h>
-#include<sys/types.h>
-#include<sys/stat.h>
-#include<termios.h>
+#include <time.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <termios.h>
 #include <unistd.h>
-#include<sys/ioctl.h>
+#include <sys/ioctl.h>
 #include <fcntl.h>
 #include <pwd.h>
-#include<grp.h>
+#include <grp.h>
 using namespace std;
 
 #ifndef MYHEADER_H
 #define MYHEADER_H
 #endif
 
-
-int listdir(const char *);
-void display(const char *);
+int listdir(const char*);
+void display(const char*);
 void enableNCanon();
-string SplitFilename(string );
+string SplitFilename(string);
 void UpArrow();
 void DownArrow();
 void LeftArrow();
