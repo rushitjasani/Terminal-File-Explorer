@@ -30,6 +30,7 @@ int main(int argc, char** argv)
     }
     strcat(cur_dir, root);
     back_stack.push(root); //back_stack saves history of visited dir.
+    printf("%c[?1049h",27); //Alternate buffer on
     listdir(root); //list directories inside root.
     enableNCanon(); //enable non-canonical mode.
     return 0;
