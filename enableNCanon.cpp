@@ -239,12 +239,45 @@ void EnterKey()
             back_stack.pop();
             string top = back_stack.top();
             strcpy(cur_dir, top.c_str());
+            int bridge[2];
+            if(pipe(bridge) == -1) perror("");
             pid_t pid = fork();
             if (pid == 0) {
-                close(2);
-                execlp("xdg-open", "xdg-open", f_path, NULL);
-                exit(0);
+                // close(2);
+                // execlp("xdg-open", "xdg-open", f_path, NULL);
+                // exit(0);
+                dup2(bridge[1],STDOUT_FILENO);
+                close(bridge[1]);
+                close(bridge[0]);
+                execlp("xdg-mime", "xdg-mime", "query", "filetype",f_path, NULL);
             }
+            char ftype[50];
+            int x = read(bridge[0],ftype,50);
+            ftype[x-1] = '\0';
+            close(bridge[0]);
+            fflush(stdout);
+            fflush(stdin);
+            
+            int bridge1[2];
+            if(pipe(bridge1) == -1) perror("");
+            pid = fork();
+            if (pid == 0) {
+                dup2(bridge1[1],STDOUT_FILENO);
+                close(bridge1[0]);
+                //write(STDOUT_FILENO,".",strlen("."));
+                if(execlp("xdg-mime", "xdg-mime", "query", "default",ftype, NULL) == -1){
+                    exit(0);
+                }
+                close(bridge1[1]);
+            }
+            //int present_chars = 0;
+            char fapp[50];
+            read(bridge1[0],fapp,50);
+            fapp[x+1] = '\0';
+            close(bridge1[0]);
+            fflush(stdout);
+            fflush(stdin);
+            cout << "~~~" << fapp << "~~~" << "OK";
         }
     }
 }
