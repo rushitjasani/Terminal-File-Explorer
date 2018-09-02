@@ -49,10 +49,8 @@ void create_dir()
             cout << "Destination is not folder." << endl;
             return;
         }
-        //cout << dest_folder << endl;
         for (unsigned int i = 1; i < my_command.size() - 1; i++) {
             string dest_path = dest_folder + "/" + my_command[i];
-
             if (mkdir(dest_path.c_str(), 0755) != 0)
                 perror("");
             else
