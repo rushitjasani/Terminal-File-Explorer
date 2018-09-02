@@ -51,7 +51,7 @@ int command_mode()
                 continue;
             }
             else if (ch[0] == 10) {
-                command_string.push_back(' ');
+                command_string.push_back('\n');
                 split_command();
                 function_call();
                 if (goto_flag)
@@ -170,10 +170,9 @@ void split_command()
     string tmp = "";
     unsigned int i = 0;
     cout << endl;
-    for (; i <= command_string.size(); i++) {
-        //&& i>0  && command_string[i-1] != '\\'
-        if (command_string[i] == ' ') {
-            my_command.push_back(tmp);
+    for (; i < command_string.size(); i++) {
+        if (command_string[i] == ' ' || command_string[i] == '\n' ) {
+            if(tmp.size() > 0) my_command.push_back(tmp);
             tmp = "";
         }
         else if (command_string[i] == '\\')
