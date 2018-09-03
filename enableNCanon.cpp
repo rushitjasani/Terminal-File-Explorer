@@ -158,7 +158,7 @@ void HomeKey()
 {
     reset_curser_top();
     strcpy(cur_dir, root);
-    back_stack.push(cur_dir);
+    if( strcmp(cur_dir,root) != 0 )back_stack.push(cur_dir);
     while (!forw_stack.empty())
         forw_stack.pop();
     listdir(cur_dir);

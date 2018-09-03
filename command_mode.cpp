@@ -91,6 +91,10 @@ void my_goto()
         printf("Improper Arguments.");
     else {
         string goto_path = create_absolute_path(my_command[1]);
+        if(!isDirectory(goto_path)) {
+            cout << " Invalid path " << endl;
+            return;
+        }
         back_stack.push(cur_dir);
         strcpy(cur_dir, goto_path.c_str());
         goto_flag = true;

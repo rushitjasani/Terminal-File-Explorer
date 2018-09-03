@@ -29,7 +29,7 @@ int listdir(const char* path)
     }
     dlist.clear();
     while ((d = readdir(dp))) {
-        if (strcmp(path, root) == 0) {
+        if (strcmp(path, root) == 0 || strcmp(path, root_ab.c_str()) == 0) {
             strcpy(cur_dir, root);
             if (strcmp(d->d_name, "..") == 0)
                 continue;

@@ -21,6 +21,11 @@ void create_file()
         printf("too few arguments:\n");
     else {
         string dest_folder = create_absolute_path(my_command[my_command.size() - 1]);
+        //verifies if destination is directory or not.
+        if(!isDirectory(dest_folder)){
+            cout << "Destination is not directory" << endl;
+            return;
+        }
         FILE* file_create;
         for (unsigned int i = 1; i < my_command.size() - 1; i++) {
             string dest_path = dest_folder + "/" + my_command[i];
@@ -45,8 +50,9 @@ void create_dir()
         printf("too few arguments\n");
     else {
         string dest_folder = create_absolute_path(my_command[my_command.size() - 1]);
+        //verifies if destination is directory or not.
         if (!isDirectory(dest_folder)) {
-            cout << "Destination is not folder." << endl;
+            cout << "Destination is not directory." << endl;
             return;
         }
         for (unsigned int i = 1; i < my_command.size() - 1; i++) {
